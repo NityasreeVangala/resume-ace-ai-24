@@ -16,9 +16,10 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(var(--landing-light))] via-background to-[hsl(var(--landing-light))]">
-        <div className="container py-20 md:py-32">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="container py-20 md:py-32 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
+            <div className="space-y-8 animate-fade-in">
               <h1 className="text-5xl md:text-6xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-[hsl(var(--landing-primary))] via-[hsl(var(--landing-secondary))] to-[hsl(var(--landing-accent))] bg-clip-text text-transparent">
                   Embark On The Journey
@@ -26,30 +27,33 @@ const Index = () => {
                 <br />
                 Of A Lifetime
               </h1>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-muted-foreground leading-relaxed">
                 Unlock your career potential with AI-powered resume analysis, curated job listings, and personalized career dashboards.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link to="/register">
-                  <Button size="lg" className="bg-[hsl(var(--landing-primary))] hover:bg-[hsl(var(--landing-secondary))]">
+                  <Button size="lg" className="bg-[hsl(var(--landing-primary))] hover:bg-[hsl(var(--landing-secondary))] shadow-elegant hover-lift">
                     Start Your Journey
                   </Button>
                 </Link>
                 <Link to="#features">
-                  <Button size="lg" variant="outline">
+                  <Button size="lg" variant="outline" className="hover-lift">
                     Learn More
                   </Button>
                 </Link>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-[hsl(var(--landing-accent))] animate-pulse"></span>
                 10k+ students • 500+ companies • 95% success rate
               </p>
             </div>
-            <div className="relative">
+            <div className="relative animate-fade-in">
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--landing-primary))] to-[hsl(var(--landing-accent))] rounded-2xl blur-3xl opacity-20"></div>
               <img
                 src={heroImage}
-                alt="Students collaborating"
-                className="rounded-2xl shadow-2xl"
+                alt="Students collaborating in a modern workspace"
+                className="rounded-2xl shadow-elegant hover-lift relative object-cover"
+                loading="eager"
               />
             </div>
           </div>
@@ -77,49 +81,49 @@ const Index = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-all hover:shadow-lg">
+            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-smooth hover-lift group">
               <CardContent className="pt-6 space-y-4">
-                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center">
+                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center group-hover:scale-110 transition-smooth">
                   <Brain className="h-6 w-6 text-[hsl(var(--landing-primary))]" />
                 </div>
                 <h3 className="font-semibold text-xl">AI Resume Analysis</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground leading-relaxed">
                   Get intelligent feedback on your resume with our advanced AI technology. Optimize your CV for maximum impact.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-all hover:shadow-lg">
+            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-smooth hover-lift group">
               <CardContent className="pt-6 space-y-4">
-                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center">
+                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center group-hover:scale-110 transition-smooth">
                   <Target className="h-6 w-6 text-[hsl(var(--landing-primary))]" />
                 </div>
                 <h3 className="font-semibold text-xl">Curated Job Listings</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground leading-relaxed">
                   Access thousands of job opportunities tailored to your skills and preferences with smart job matching.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-all hover:shadow-lg">
+            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-smooth hover-lift group">
               <CardContent className="pt-6 space-y-4">
-                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center">
+                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center group-hover:scale-110 transition-smooth">
                   <TrendingUp className="h-6 w-6 text-[hsl(var(--landing-primary))]" />
                 </div>
                 <h3 className="font-semibold text-xl">Career Dashboard</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground leading-relaxed">
                   Track your application progress, skill development, and career growth all in one place.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-all hover:shadow-lg">
+            <Card className="border-2 hover:border-[hsl(var(--landing-accent))] transition-smooth hover-lift group">
               <CardContent className="pt-6 space-y-4">
-                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center">
+                <div className="h-12 w-12 rounded-lg bg-[hsl(var(--landing-light))] flex items-center justify-center group-hover:scale-110 transition-smooth">
                   <MessageSquare className="h-6 w-6 text-[hsl(var(--landing-primary))]" />
                 </div>
                 <h3 className="font-semibold text-xl">Interview Preparation</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground leading-relaxed">
                   Practice with AI-powered mock interviews and get real-time feedback to ace your next interview.
                 </p>
               </CardContent>
@@ -157,8 +161,9 @@ const Index = () => {
                 </Button>
               </Link>
             </div>
-            <div>
-              <img src={resumeAnalysis} alt="Resume Analysis" className="rounded-2xl shadow-xl" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--student-primary))] to-[hsl(var(--student-accent))] rounded-2xl blur-3xl opacity-20"></div>
+              <img src={resumeAnalysis} alt="AI Resume Analysis Dashboard" className="rounded-2xl shadow-elegant hover-lift relative object-cover" loading="lazy" />
             </div>
           </div>
         </div>
@@ -168,8 +173,9 @@ const Index = () => {
       <section id="for-recruiters" className="py-20 bg-gradient-to-br from-[hsl(var(--recruiter-light))] to-background">
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1">
-              <img src={jobMatching} alt="Job Matching" className="rounded-2xl shadow-xl" />
+            <div className="order-2 lg:order-1 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--recruiter-primary))] to-[hsl(var(--recruiter-accent))] rounded-2xl blur-3xl opacity-20"></div>
+              <img src={jobMatching} alt="AI-Powered Job Matching Network" className="rounded-2xl shadow-elegant hover-lift relative object-cover" loading="lazy" />
             </div>
             <div className="space-y-6 order-1 lg:order-2">
               <h2 className="text-3xl md:text-4xl font-bold">For Recruiters</h2>
@@ -229,8 +235,9 @@ const Index = () => {
                 </Button>
               </Link>
             </div>
-            <div>
-              <img src={dashboardAnalytics} alt="Dashboard Analytics" className="rounded-2xl shadow-xl" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--placement-primary))] to-[hsl(var(--placement-accent))] rounded-2xl blur-3xl opacity-20"></div>
+              <img src={dashboardAnalytics} alt="Comprehensive Analytics Dashboard" className="rounded-2xl shadow-elegant hover-lift relative object-cover" loading="lazy" />
             </div>
           </div>
         </div>

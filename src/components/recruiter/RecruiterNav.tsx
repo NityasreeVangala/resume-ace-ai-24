@@ -8,7 +8,7 @@ const RecruiterNav = () => {
   const isActive = (path: string) => location.pathname === path;
   
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-soft">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/recruiter/dashboard" className="flex items-center space-x-2">
           <GraduationCap className="h-8 w-8 text-[hsl(var(--recruiter-primary))]" />
