@@ -3,42 +3,46 @@ import { GraduationCap, Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="border-t bg-muted/50">
-      <div className="container py-12">
+    <footer className="bg-gradient-to-br from-[hsl(var(--landing-primary))] to-[hsl(var(--landing-secondary))] text-white">
+      <div className="container py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand Section */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <GraduationCap className="h-8 w-8 text-primary" />
+              <GraduationCap className="h-8 w-8" />
               <span className="text-xl font-bold">CampusCatalyst</span>
             </Link>
-            <p className="text-sm text-muted-foreground">
-              Empowering students to achieve their career dreams through AI-powered tools and insights.
+            <p className="text-sm text-white/80 leading-relaxed">
+              Empowering students to achieve their career dreams with AI-powered tools and insights.
             </p>
           </div>
 
+          {/* Quick Links */}
           <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/#features" className="text-muted-foreground hover:text-primary">Features</Link></li>
-              <li><Link to="/#about" className="text-muted-foreground hover:text-primary">About Us</Link></li>
-              <li><Link to="/#pricing" className="text-muted-foreground hover:text-primary">Pricing</Link></li>
-              <li><Link to="/blog" className="text-muted-foreground hover:text-primary">Blog</Link></li>
+            <h4 className="font-semibold mb-4 text-[hsl(var(--landing-light))]">Quick Links</h4>
+            <ul className="space-y-2 text-sm text-white/80">
+              <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></li>
             </ul>
           </div>
 
+          {/* Support */}
           <div>
-            <h3 className="font-semibold mb-4">Support</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/help" className="text-muted-foreground hover:text-primary">Help Center</Link></li>
-              <li><Link to="/faq" className="text-muted-foreground hover:text-primary">FAQ</Link></li>
-              <li><Link to="/privacy" className="text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="text-muted-foreground hover:text-primary">Terms of Service</Link></li>
+            <h4 className="font-semibold mb-4 text-[hsl(var(--landing-light))]">Support</h4>
+            <ul className="space-y-2 text-sm text-white/80">
+              <li><Link to="/help" className="hover:text-white transition-colors">Help Center</Link></li>
+              <li><Link to="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
+              <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
 
+          {/* Contact */}
           <div>
-            <h3 className="font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-4 text-[hsl(var(--landing-light))]">Contact Us</h4>
+            <ul className="space-y-2 text-sm text-white/80">
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4" />
                 <span>support@campuscatalyst.com</span>
@@ -55,8 +59,11 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          © 2025 CampusCatalyst. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-8 border-t border-white/20">
+          <div className="text-center text-sm text-white/60">
+            <p>© 2025 CampusCatalyst. All rights reserved.</p>
+          </div>
         </div>
       </div>
     </footer>
