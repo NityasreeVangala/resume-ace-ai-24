@@ -1,6 +1,8 @@
 import PlacementNav from "@/components/placement/PlacementNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, Briefcase, TrendingUp, Calendar, DollarSign } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 const PlacementDashboard = () => {
   const stats = [
@@ -37,10 +39,36 @@ const PlacementDashboard = () => {
   ];
 
   const departmentData = [
-    { name: "Computer Science", placements: 120, percentage: 85 },
-    { name: "Electronics", placements: 75, percentage: 78 },
-    { name: "Mechanical", placements: 60, percentage: 72 },
-    { name: "Civil", placements: 45, percentage: 65 },
+    { name: "CSE", fullName: "Computer Science and Engineering", placements: 145, percentage: 87, avgPackage: 8.5 },
+    { name: "IT", fullName: "Information Technology", placements: 128, percentage: 85, avgPackage: 8.2 },
+    { name: "AI & DS", fullName: "Artificial Intelligence and Data Science", placements: 98, percentage: 82, avgPackage: 9.1 },
+    { name: "ECE", fullName: "Electronics and Communication Engineering", placements: 85, percentage: 76, avgPackage: 7.2 },
+    { name: "EEE", fullName: "Electrical and Electronics Engineering", placements: 72, percentage: 74, avgPackage: 6.8 },
+    { name: "Mechanical", fullName: "Mechanical Engineering", placements: 68, percentage: 71, avgPackage: 6.5 },
+    { name: "Mechatronics", fullName: "Mechatronics Engineering", placements: 45, percentage: 69, avgPackage: 6.9 },
+    { name: "Civil", fullName: "Civil Engineering", placements: 52, percentage: 65, avgPackage: 5.8 },
+  ];
+
+  const chartConfig = {
+    placements: {
+      label: "Placements",
+      color: "hsl(var(--placement-primary))",
+    },
+    percentage: {
+      label: "Percentage",
+      color: "hsl(var(--placement-accent))",
+    },
+  };
+
+  const COLORS = [
+    "hsl(var(--placement-primary))",
+    "hsl(var(--placement-accent))",
+    "hsl(var(--placement-secondary))",
+    "#8b5cf6",
+    "#ec4899",
+    "#f59e0b",
+    "#10b981",
+    "#6366f1",
   ];
 
   return (
@@ -105,27 +133,79 @@ const PlacementDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Department-wise Placements */}
+          {/* Placement Distribution Pie Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Department-wise Placements</CardTitle>
-              <CardDescription>Placement statistics by department</CardDescription>
+              <CardTitle>Placement Distribution</CardTitle>
+              <CardDescription>Stream-wise placement breakdown</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {departmentData.map((dept, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{dept.name}</span>
-                    <span className="text-muted-foreground">{dept.placements} placements ({dept.percentage}%)</span>
-                  </div>
-                  <div className="h-2 bg-[hsl(var(--placement-lighter))] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-[hsl(var(--placement-primary))] rounded-full"
-                      style={{ width: `${dept.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={departmentData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percentage }) => `${name}: ${percentage}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="placements"
+                    >
+                      {departmentData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Department-wise Placement Charts */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Bar Chart - Placements */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Stream-wise Placements</CardTitle>
+              <CardDescription>Number of students placed per stream</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={departmentData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" stroke="hsl(var(--foreground))" fontSize={12} />
+                    <YAxis stroke="hsl(var(--foreground))" fontSize={12} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="placements" fill="hsl(var(--placement-primary))" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Bar Chart - Average Package */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Average Package by Stream</CardTitle>
+              <CardDescription>Package in LPA across departments</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={departmentData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" stroke="hsl(var(--foreground))" fontSize={12} />
+                    <YAxis stroke="hsl(var(--foreground))" fontSize={12} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="avgPackage" fill="hsl(var(--placement-accent))" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
         </div>

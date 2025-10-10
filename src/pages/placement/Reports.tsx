@@ -3,14 +3,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, Download, TrendingUp } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, Legend } from "recharts";
 
 const PlacementReports = () => {
   const departmentStats = [
-    { name: "Computer Science", total: 150, placed: 128, percentage: 85.3, avgPackage: "₹8.5 LPA" },
-    { name: "Electronics", total: 120, placed: 94, percentage: 78.3, avgPackage: "₹7.2 LPA" },
-    { name: "Mechanical", total: 100, placed: 72, percentage: 72.0, avgPackage: "₹6.5 LPA" },
-    { name: "Civil", total: 80, placed: 52, percentage: 65.0, avgPackage: "₹5.8 LPA" },
+    { name: "CSE", fullName: "Computer Science and Engineering", total: 167, placed: 145, percentage: 86.8, avgPackage: 8.5, packageNum: 8.5 },
+    { name: "IT", fullName: "Information Technology", total: 151, placed: 128, percentage: 84.8, avgPackage: 8.2, packageNum: 8.2 },
+    { name: "AI & DS", fullName: "Artificial Intelligence and Data Science", total: 120, placed: 98, percentage: 81.7, avgPackage: 9.1, packageNum: 9.1 },
+    { name: "ECE", fullName: "Electronics and Communication Engineering", total: 112, placed: 85, percentage: 75.9, avgPackage: 7.2, packageNum: 7.2 },
+    { name: "EEE", fullName: "Electrical and Electronics Engineering", total: 97, placed: 72, percentage: 74.2, avgPackage: 6.8, packageNum: 6.8 },
+    { name: "Mechanical", fullName: "Mechanical Engineering", total: 96, placed: 68, percentage: 70.8, avgPackage: 6.5, packageNum: 6.5 },
+    { name: "Mechatronics", fullName: "Mechatronics Engineering", total: 65, placed: 45, percentage: 69.2, avgPackage: 6.9, packageNum: 6.9 },
+    { name: "Civil", fullName: "Civil Engineering", total: 80, placed: 52, percentage: 65.0, avgPackage: 5.8, packageNum: 5.8 },
   ];
+
+  const chartConfig = {
+    placed: {
+      label: "Placed",
+      color: "hsl(var(--placement-primary))",
+    },
+    total: {
+      label: "Total",
+      color: "hsl(var(--placement-lighter))",
+    },
+    percentage: {
+      label: "Percentage",
+      color: "hsl(var(--placement-accent))",
+    },
+  };
 
   const topRecruiters = [
     { company: "Infosys", hires: 45, avgPackage: "₹6.0 LPA" },
@@ -89,8 +110,59 @@ const PlacementReports = () => {
           </Card>
         </div>
 
+        {/* Charts Section */}
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Department-wise Statistics */}
+          {/* Placement Rate Comparison */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Placement Rate by Stream</CardTitle>
+              <CardDescription>Comparison of placement percentages</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={departmentStats} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis type="number" stroke="hsl(var(--foreground))" fontSize={12} />
+                    <YAxis dataKey="name" type="category" stroke="hsl(var(--foreground))" fontSize={12} width={80} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="percentage" fill="hsl(var(--placement-primary))" radius={[0, 8, 8, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Package Comparison */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Average Package Trends</CardTitle>
+              <CardDescription>Package distribution across streams</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={departmentStats}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" stroke="hsl(var(--foreground))" fontSize={12} />
+                    <YAxis stroke="hsl(var(--foreground))" fontSize={12} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Line 
+                      type="monotone" 
+                      dataKey="packageNum" 
+                      stroke="hsl(var(--placement-accent))" 
+                      strokeWidth={3}
+                      dot={{ fill: "hsl(var(--placement-accent))", r: 5 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Department-wise Statistics Table */}
           <Card>
             <CardHeader>
               <CardTitle>Department-wise Placement Statistics</CardTitle>
@@ -101,13 +173,13 @@ const PlacementReports = () => {
                 {departmentStats.map((dept, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{dept.name}</span>
+                      <span className="font-medium">{dept.fullName}</span>
                       <span className="text-muted-foreground">
                         {dept.placed}/{dept.total} ({dept.percentage}%)
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Avg Package: {dept.avgPackage}</span>
+                      <span>Avg Package: ₹{dept.avgPackage} LPA</span>
                     </div>
                     <div className="h-2 bg-[hsl(var(--placement-lighter))] rounded-full overflow-hidden">
                       <div 
