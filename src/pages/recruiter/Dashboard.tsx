@@ -1,145 +1,191 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import RecruiterNav from "@/components/recruiter/RecruiterNav";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, Users, TrendingUp, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Briefcase, Clock, Eye } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL } from "../../config/api";
+import Modal from "react-modal";
+
+interface Job {
+  _id?: string;
+  title: string;
+  company: string;
+  location: string;
+  salary: string;
+  type: string;
+  posted: string;
+  description: string;
+}
 
 const RecruiterDashboard = () => {
-  const stats = [
-    { label: "Active Job Posts", value: "6", change: "+2 this week", icon: Briefcase },
-    { label: "Total Applications", value: "152", change: "+18 new today", icon: Users },
-    { label: "Hires Completed", value: "18", change: "+3 this month", icon: TrendingUp },
-    { label: "Pending Interviews", value: "12", change: "5 scheduled this week", icon: Clock },
+  const { toast } = useToast();
+  const recruiterName = localStorage.getItem("userName") || "Recruiter";
+
+  // State
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newJob, setNewJob] = useState<Job>({
+    title: "",
+    company: "",
+    location: "",
+    salary: "",
+    type: "Full-time",
+    posted: "",
+    description: "",
+  });
+
+  // Demo fallback
+  const demoJobs: Job[] = [
+    {
+      title: "Frontend Developer",
+      company: "Google",
+      location: "Bangalore",
+      salary: "₹7-12 LPA",
+      type: "Full-time",
+      posted: "2 days ago",
+      description: "Build amazing React applications",
+    },
+    {
+      title: "Backend Engineer",
+      company: "Microsoft",
+      location: "Hyderabad",
+      salary: "₹10-15 LPA",
+      type: "Full-time",
+      posted: "3 days ago",
+      description: "Develop robust APIs with Node.js",
+    },
   ];
 
-  const recentApplicants = [
-    {
-      name: "Nitya Vangala",
-      position: "Software Engineer",
-      status: "Under Review",
-      appliedDate: "02 Oct 2025",
-      time: "2 hours ago",
-    },
-    {
-      name: "Rahul Sharma",
-      position: "Data Analyst",
-      status: "Interview",
-      appliedDate: "03 Oct 2025",
-      time: "5 hours ago",
-    },
-    {
-      name: "Priya Patel",
-      position: "Frontend Developer",
-      status: "Under Review",
-      appliedDate: "04 Oct 2025",
-      time: "1 day ago",
-    },
-  ];
+  // Fetch jobs posted by this recruiter
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const jobListings = [
-    { title: "Software Engineer", applicants: 42, status: "Active", posted: "01 Oct 2025" },
-    { title: "Data Analyst", applicants: 25, status: "Active", posted: "05 Oct 2025" },
-    { title: "Frontend Developer", applicants: 38, status: "Active", posted: "03 Oct 2025" },
-    { title: "Product Manager", applicants: 15, status: "Closed", posted: "20 Sept 2025" },
-  ];
+        const recruiterId = localStorage.getItem("userId");
+        const res = await axios.get(`${API_BASE_URL}/recruiter/jobs/${recruiterId}`);
+
+        setJobs(res.data || demoJobs);
+        setFilteredJobs(res.data || demoJobs);
+      } catch (err: any) {
+        console.error(err);
+        setJobs(demoJobs);
+        setFilteredJobs(demoJobs);
+        setError("Could not connect to backend. Showing demo data.");
+        toast({ title: "Offline Mode", description: "Using demo data", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [toast]);
+
+  // Filter/search jobs
+  useEffect(() => {
+    const filtered = jobs.filter(
+      (job) =>
+        job.title.toLowerCase().includes(search.toLowerCase()) ||
+        job.company.toLowerCase().includes(search.toLowerCase()) ||
+        job.location.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredJobs(filtered);
+  }, [search, jobs]);
+
+  const openModal = () => setIsModalOpen(true);
+
+  const handleCreateJob = async () => {
+    if (!newJob.title || !newJob.company) {
+      toast({ title: "All fields required", variant: "destructive" });
+      return;
+    }
+    try {
+      const recruiterId = localStorage.getItem("userId");
+      const res = await axios.post(`${API_BASE_URL}/recruiter/jobs/${recruiterId}`, newJob);
+      setJobs((prev) => [...prev, res.data]);
+      setFilteredJobs((prev) => [...prev, res.data]);
+      toast({ title: "Job Posted", description: `${newJob.title} created successfully` });
+      setIsModalOpen(false);
+      setNewJob({ title: "", company: "", location: "", salary: "", type: "Full-time", posted: "", description: "" });
+    } catch (err: any) {
+      toast({ title: "Failed to create job", description: err.message, variant: "destructive" });
+    }
+  };
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading jobs...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--recruiter-light))] to-background">
       <RecruiterNav />
-      
+
       <div className="container py-8 space-y-8">
-        {/* Welcome Section */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-[hsl(var(--recruiter-primary))]">Welcome back, John</h1>
-          <p className="text-muted-foreground">
-            HR Manager at Infosys • Here's your recruitment summary for this week
-          </p>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Hi {recruiterName} 👋</h1>
+          <Button onClick={openModal}>Post New Job</Button>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
-            <Card key={index} className="border-2 hover:border-[hsl(var(--recruiter-accent))] transition-all">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.label}</CardTitle>
-                <stat.icon className="h-4 w-4 text-[hsl(var(--recruiter-primary))]" />
+        {error && <p className="text-red-500">{error}</p>}
+
+        <Input
+          placeholder="Search jobs..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-xs"
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+          {filteredJobs.map((job, index) => (
+            <Card key={index} className="hover:shadow-lg transition-all border-2">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>{job.title}</CardTitle>
+                    <CardDescription>{job.company}</CardDescription>
+                  </div>
+                  <Badge>{job.type}</Badge>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">{stat.change}</p>
+                <p>{job.description}</p>
+                <p className="text-sm text-muted-foreground">{job.location}</p>
+                <p className="text-sm text-muted-foreground">Salary: {job.salary}</p>
               </CardContent>
             </Card>
           ))}
         </div>
-
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Recent Applicants */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Recent Applicants</CardTitle>
-                  <CardDescription>Review and manage candidate applications</CardDescription>
-                </div>
-                <Link to="/recruiter/applicants">
-                  <Button variant="outline" size="sm">View All</Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentApplicants.map((applicant, index) => (
-                <div key={index} className="flex items-start justify-between border-b pb-4 last:border-0">
-                  <div className="space-y-1">
-                    <p className="font-medium">{applicant.name}</p>
-                    <p className="text-sm text-muted-foreground">{applicant.position}</p>
-                    <p className="text-xs text-muted-foreground">Applied on {applicant.appliedDate}</p>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <Badge variant="outline" className="border-[hsl(var(--recruiter-accent))]">
-                      {applicant.status}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground">{applicant.time}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* My Job Listings */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>My Job Listings</CardTitle>
-                  <CardDescription>Manage your active and closed positions</CardDescription>
-                </div>
-                <Link to="/recruiter/post-job">
-                  <Button size="sm" className="bg-[hsl(var(--recruiter-primary))] hover:bg-[hsl(var(--recruiter-secondary))]">
-                    Post Job
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {jobListings.map((job, index) => (
-                <div key={index} className="flex items-center justify-between border-b pb-4 last:border-0">
-                  <div className="space-y-1">
-                    <p className="font-medium">{job.title}</p>
-                    <p className="text-sm text-muted-foreground">{job.applicants} applicants</p>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <Badge className={job.status === "Active" ? "bg-green-500" : "bg-gray-500"}>
-                      {job.status}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground">{job.posted}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
       </div>
+
+      {/* Post Job Modal */}
+      <Modal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} ariaHideApp={false} className="modal-content">
+        <h2 className="text-xl font-bold mb-4">Post New Job</h2>
+        <div className="space-y-2">
+          <Input placeholder="Job Title" value={newJob.title} onChange={(e) => setNewJob({ ...newJob, title: e.target.value })} />
+          <Input placeholder="Company" value={newJob.company} onChange={(e) => setNewJob({ ...newJob, company: e.target.value })} />
+          <Input placeholder="Location" value={newJob.location} onChange={(e) => setNewJob({ ...newJob, location: e.target.value })} />
+          <Input placeholder="Salary" value={newJob.salary} onChange={(e) => setNewJob({ ...newJob, salary: e.target.value })} />
+          <Input placeholder="Type (Full-time / Part-time)" value={newJob.type} onChange={(e) => setNewJob({ ...newJob, type: e.target.value })} />
+          <Input placeholder="Description" value={newJob.description} onChange={(e) => setNewJob({ ...newJob, description: e.target.value })} />
+        </div>
+        <div className="mt-4 flex justify-end space-x-2">
+          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
+          <Button onClick={handleCreateJob}>Post Job</Button>
+        </div>
+      </Modal>
     </div>
   );
 };

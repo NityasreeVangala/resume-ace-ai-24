@@ -1,0 +1,18 @@
+import { Navigate, Outlet } from "react-router-dom";
+
+const ProtectedRoute = ({ allowedRoles }: { allowedRoles: string[] }) => {
+  // Get token and role from localStorage
+  const token = localStorage.getItem("studentToken");
+  const role = localStorage.getItem("userRole");
+
+  // If user is not logged in, redirect to login page
+  if (!token) return <Navigate to="/login" replace />;
+
+  // If user's role is not allowed, redirect to login
+  if (allowedRoles && !allowedRoles.includes(role!)) return <Navigate to="/login" replace />;
+
+  // If authenticated and role is allowed, render child routes
+  return <Outlet />;
+};
+
+export default ProtectedRoute;

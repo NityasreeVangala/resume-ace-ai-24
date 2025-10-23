@@ -1,12 +1,26 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GraduationCap } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { GraduationCap, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "../config/api";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -16,16 +30,18 @@ const Register = () => {
     confirmPassword: "",
     role: "",
   });
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Password Mismatch",
-        description: "Passwords do not match. Please try again.",
+        description: "Passwords do not match",
         variant: "destructive",
       });
       return;
@@ -34,25 +50,45 @@ const Register = () => {
     if (!formData.role) {
       toast({
         title: "Role Required",
-        description: "Please select your role to continue.",
+        description: "Please select your role",
         variant: "destructive",
       });
       return;
     }
 
-    // Demo registration logic
-    toast({
-      title: "Registration Successful",
-      description: "Welcome to CampusCatalyst!",
-    });
+    setLoading(true);
 
-    // Redirect based on role
-    if (formData.role === "student") {
-      navigate("/student/dashboard");
-    } else if (formData.role === "recruiter") {
-      navigate("/recruiter/dashboard");
-    } else if (formData.role === "placement") {
-      navigate("/placement/dashboard");
+    try {
+      const response = await api.post("/auth/register", {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+      });
+
+      const { token, role } = response.data;
+
+      // ✅ Store token as authToken
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("userRole", role);
+
+      toast({
+        title: "Registration Successful",
+        description: "Welcome to CampusCatalyst!",
+      });
+
+      if (role === "student") navigate("/student/dashboard");
+      else if (role === "recruiter") navigate("/recruiter/dashboard");
+      else if (role === "placement") navigate("/placement/dashboard");
+      else navigate("/login");
+    } catch (err: any) {
+      toast({
+        title: "Registration Failed",
+        description: err.response?.data?.message || err.message || "Unable to register",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,18 +96,17 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[hsl(var(--auth-light))] via-background to-[hsl(var(--auth-accent))] py-12">
       <div className="container max-w-lg p-4">
         <Card className="shadow-xl">
-          <CardHeader className="space-y-1">
-            <div className="flex justify-center mb-4">
-              <GraduationCap className="h-12 w-12 text-[hsl(var(--auth-primary))]" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-center">Create Your Account</CardTitle>
-            <CardDescription className="text-center">
+          <CardHeader className="space-y-1 text-center">
+            <GraduationCap className="h-12 w-12 text-[hsl(var(--auth-primary))] mx-auto mb-2" />
+            <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
+            <CardDescription>
               Join CampusCatalyst and accelerate your placement journey
             </CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input
                   id="fullName"
@@ -80,11 +115,11 @@ const Register = () => {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
-                  className="border-[hsl(var(--auth-accent))] focus:border-[hsl(var(--auth-primary))]"
+                  disabled={loading}
                 />
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -93,11 +128,11 @@ const Register = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="border-[hsl(var(--auth-accent))] focus:border-[hsl(var(--auth-primary))]"
+                  disabled={loading}
                 />
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
@@ -106,11 +141,11 @@ const Register = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  className="border-[hsl(var(--auth-accent))] focus:border-[hsl(var(--auth-primary))]"
+                  disabled={loading}
                 />
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
@@ -119,14 +154,18 @@ const Register = () => {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   required
-                  className="border-[hsl(var(--auth-accent))] focus:border-[hsl(var(--auth-primary))]"
+                  disabled={loading}
                 />
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="role">Role</Label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger className="border-[hsl(var(--auth-accent))] focus:border-[hsl(var(--auth-primary))]">
+                <Select
+                  value={formData.role}
+                  onValueChange={(value) => setFormData({ ...formData, role: value })}
+                  disabled={loading}
+                >
+                  <SelectTrigger>
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -137,23 +176,21 @@ const Register = () => {
                 </Select>
               </div>
 
-              <Button type="submit" className="w-full bg-[hsl(var(--auth-primary))] hover:bg-[hsl(var(--auth-secondary))]">
-                Register / Sign Up
+              <Button type="submit" className="w-full flex items-center justify-center" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                    Registering...
+                  </>
+                ) : (
+                  "Register / Sign Up"
+                )}
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="text-sm text-center text-muted-foreground">
-              By continuing, you agree to our{" "}
-              <Link to="/terms" className="text-[hsl(var(--auth-primary))] hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link to="/privacy" className="text-[hsl(var(--auth-primary))] hover:underline">
-                Privacy Policy
-              </Link>
-            </div>
-            <div className="text-sm text-center">
+
+          <CardFooter className="flex flex-col space-y-2 text-center">
+            <div>
               Already have an account?{" "}
               <Link to="/login" className="text-[hsl(var(--auth-primary))] hover:underline font-medium">
                 Login here
